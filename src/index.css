@@ -1,0 +1,455 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #000000;
+  --surface: #0b0b0c;
+  --surface-elevated: #121214;
+  --ink: #f4f2ef;
+  --dim: #9b9691;
+  --line: rgba(244, 242, 239, 0.16);
+  --line-strong: rgba(244, 242, 239, 0.32);
+  --accent: #d4b483;
+  --pad: clamp(16px, 2.6vw, 34px);
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --hw: min(58vw, 660px);
+  --persp: 1150px;
+  --cw: 190px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --serif-en: "Playfair Display", "Times New Roman", serif;
+  --sans-en: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --serif-ar: "Aref Ruqaa", "Amiri", serif;
+  --sans-ar: "IBM Plex Sans Arabic", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  scrollbar-gutter: stable;
+  overflow-x: clip;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html[lang="en"] {
+  --serif: var(--serif-en);
+  --sans: var(--sans-en);
+}
+
+html[lang="ar"] {
+  --serif: var(--serif-ar);
+  --sans: var(--sans-ar);
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+}
+
+.font-editorial {
+  font-family: var(--serif);
+}
+
+html[lang="ar"] .font-editorial {
+  letter-spacing: 0;
+  line-height: 1.42;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* UNIFIED PURE EYE PORTAL (INTRO + BIDIRECTIONAL SCROLL) */
+#eye-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: none;
+  overflow: hidden;
+  background: #000;
+  opacity: 1;
+  will-change: opacity;
+}
+
+#eye-portal video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+#eye-portal .eye-fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 50%, #000 0%, #000 11%, #1b3a26 22%, #4a6b3d 34%, #203b25 46%, #09110b 64%, #000 84%);
+  transform-origin: 50% 50%;
+}
+
+#eye-portal .eye-pupil-veil {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.portal-chrome {
+  opacity: var(--portal-ui-opacity, 0);
+  pointer-events: var(--portal-ui-pe, none);
+  transition: opacity 0.25s ease-out;
+}
+
+/* 3D EYEGLASSES SCULPTURE STAGE — GPU-LIGHT, ZERO-LAG COMPOSITING */
+#stage {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  perspective: var(--persp);
+  perspective-origin: 50% 50%;
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#stage.dragging {
+  cursor: grabbing;
+  touch-action: none;
+}
+
+#world {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+#orb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  opacity: 1;
+  transform: none;
+}
+
+#headline {
+  position: fixed;
+  top: clamp(78px, 11vh, 118px);
+  left: 50%;
+  width: min(90vw, 720px);
+  transform: translateX(-50%);
+  text-align: center;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(26px, 3.6vw, 52px);
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  color: #ffffff;
+  text-shadow: 0 4px 38px rgba(0, 0, 0, 0.78);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 18;
+  margin: 0;
+}
+
+html[lang="ar"] #headline {
+  letter-spacing: 0;
+  line-height: 1.38;
+  font-size: clamp(28px, 3.9vw, 54px);
+}
+
+.glasses-wireframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  transform-style: preserve-3d;
+}
+
+#headline .inner {
+  display: block;
+  width: 100%;
+}
+
+#headline .word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.42em);
+  filter: blur(7px);
+  transition:
+    opacity 1.05s var(--ease),
+    transform 1.15s var(--ease),
+    filter 1.05s var(--ease);
+  transition-delay: calc(0.35s + var(--i, 0) * 0.085s);
+}
+
+#headline.revealed .word {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* 62 FLOATING BACKGROUND-FREE EYEGLASSES — ZERO-LAG RESTING, DRAMATIC HOVER */
+.sphere-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--cw);
+  height: calc(var(--cw) * 0.75);
+  margin-left: calc(var(--cw) / -2);
+  margin-top: calc(var(--cw) * -0.375);
+  cursor: pointer;
+  touch-action: none;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+  outline: none;
+}
+
+.sphere-card figure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: visible;
+  background: transparent;
+  transform-style: preserve-3d;
+  transition: transform 0.28s var(--ease);
+}
+
+/* Soft radial champagne-gold hover aura (invisible at rest, zero GPU cost at rest) */
+.sphere-card figure::before {
+  content: "";
+  position: absolute;
+  inset: -16%;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(212, 180, 131, 0.32) 0%,
+    rgba(212, 180, 131, 0.12) 45%,
+    rgba(212, 180, 131, 0) 72%
+  );
+  border: 1px solid rgba(212, 180, 131, 0.45);
+  opacity: 0;
+  transform: scale(0.72);
+  transition: opacity 0.24s var(--ease), transform 0.28s var(--ease);
+  pointer-events: none;
+}
+
+.sphere-card img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+  transition: filter 0.24s var(--ease);
+}
+
+/* Active Hover / Keyboard Focus on any of the 62 glasses */
+#stage:not(.dragging) .sphere-card:hover,
+#stage:not(.dragging) .sphere-card.is-hovered,
+.sphere-card:focus-visible {
+  z-index: 60;
+  opacity: 1 !important;
+}
+
+#stage:not(.dragging) .sphere-card:hover figure,
+#stage:not(.dragging) .sphere-card.is-hovered figure,
+.sphere-card:focus-visible figure {
+  transform: translate3d(0, -6px, 46px) scale(1.36);
+}
+
+#stage:not(.dragging) .sphere-card:hover figure::before,
+#stage:not(.dragging) .sphere-card.is-hovered figure::before,
+.sphere-card:focus-visible figure::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+#stage:not(.dragging) .sphere-card:hover img,
+#stage:not(.dragging) .sphere-card.is-hovered img,
+.sphere-card:focus-visible img {
+  filter: brightness(1.22) contrast(1.06) drop-shadow(0 12px 24px rgba(212, 180, 131, 0.52));
+}
+
+/* SINGLE FLOATING UPRIGHT HOVER PREVIEW CARD (NEVER FLIPPED, ZERO LAG) */
+.hover-frame-card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 80;
+  pointer-events: none;
+  width: 268px;
+  background: rgba(9, 9, 12, 0.94);
+  border: 1px solid rgba(212, 180, 131, 0.48);
+  border-radius: 12px;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  padding: 10px;
+  opacity: 0;
+  transform: translate3d(-9999px, -9999px, 0) scale(0.95);
+  transition: opacity 0.16s var(--ease);
+  will-change: transform, opacity;
+}
+
+.hover-frame-card.visible {
+  opacity: 1;
+}
+
+/* VIGNETTE */
+.vig {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 88% 92% at 50% 50%,
+    transparent 44%,
+    rgba(0, 0, 0, 0.32) 78%,
+    rgba(0, 0, 0, 0.78) 100%
+  );
+  transition: opacity 0.6s var(--ease);
+}
+
+.vig.hidden-vig {
+  opacity: 0;
+}
+
+/* SCROLL CUE ANIMATION */
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  55% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.cue-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  animation: sweep 2.6s var(--ease) infinite;
+}
+
+/* CUSTOM CURSOR */
+#dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 19px;
+  height: 19px;
+  margin-left: -9.5px;
+  margin-top: -9.5px;
+  border-radius: 50%;
+  background: rgba(214, 212, 209, 0.9);
+  mix-blend-mode: difference;
+  border: 1px solid transparent;
+  pointer-events: none;
+  z-index: 300;
+  opacity: 0;
+  transition:
+    width 0.24s var(--ease),
+    height 0.24s var(--ease),
+    margin 0.24s var(--ease),
+    background 0.24s var(--ease),
+    border-color 0.24s var(--ease),
+    opacity 0.2s ease;
+}
+
+#dot.visible {
+  opacity: 1;
+}
+
+#dot.wide {
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
+  background: rgba(212, 180, 131, 0.16);
+  border-color: rgba(212, 180, 131, 0.85);
+}
+
+@media (hover: none), (pointer: coarse) {
+  #dot,
+  .hover-frame-card {
+    display: none !important;
+  }
+}
+
+/* RESPONSIVE HEADLINE WIDTH & SCALE */
+@media (max-width: 768px) {
+  #headline {
+    font-size: clamp(24px, 6.6vw, 38px);
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --hw: min(86vw, 360px);
+    --pad: clamp(14px, 4vw, 18px);
+  }
+}
+
+@media (max-width: 380px) {
+  :root {
+    --hw: min(90vw, 320px);
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  #headline {
+    font-size: clamp(20px, 4.8vh, 30px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.14s !important;
+  }
+}
+
+/* CUSTOM SCROLLBAR */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050506;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(244, 242, 239, 0.22);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(244, 242, 239, 0.38);
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Nazar Optical Atelier",
+  "description": "Luxury bilingual Arabic & English eyewear storefront with interactive 3D sphere archive, 24+ optical and sun frame collections, lens customization, and Saudi payment methods.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
